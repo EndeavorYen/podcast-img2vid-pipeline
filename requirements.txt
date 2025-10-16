@@ -1,0 +1,10 @@
+diffusers
+transformers
+accelerate
+safetensors
+imageio-ffmpeg
+opencv-python
+tqdm
+pandas
+scenedetect
+moviepy
