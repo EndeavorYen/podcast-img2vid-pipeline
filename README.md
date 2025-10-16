@@ -20,12 +20,15 @@ This is ideal for educational or children's podcasts that use a series of static
 
 ```
 repo-root/
-├── animate_podcast_v2.py      # Step 1 & 3 (Scene Extraction / Reassembly)
-├── step2_local_i2v_svd.py     # Step 2 (Local I2V: Stable Video Diffusion)
+├── animate_podcast_v2.py      # Main pipeline script
+├── modules/                   #
+│   ├── step1_scene_detection.py # Module for scene detection
+│   ├── step2_i2v.py             # Module for image-to-video
+│   └── step3_recombine.py       # Module for video recombination
 ├── 001.mp4                    # Your original podcast video (example)
-├── 1_extracted_images/        # Output of Step 1 (image_001.png, ...)
-├── 2_animated_clips/          # Output of Step 2 (image_001.mp4, ...)
-├── requirements.txt           # Optional Python dependencies
+├── 1_extracted_images/        # Output of Step 1
+├── 2_animated_clips/          # Output of Step 2
+├── requirements.txt           # Python dependencies
 └── README.md
 ```
 
@@ -95,50 +98,39 @@ repo-root/
 
 ## How to Use
 
-### Step 1: Scene Detection & Image Extraction
+The entire pipeline is now controlled by `animate_podcast_v2.py`. You can run all steps at once or specify which ones to execute.
 
-Run the following command in your activated virtual environment (PowerShell or Bash):
+### Example 1: Run the full pipeline
+
+This command runs all three steps in sequence: Scene Detection -> I2V Generation -> Recombination.
 ```bash
-python animate_podcast_v2.py "001.mp4" --step 1 -t 30
+python animate_podcast_v2.py "001.mp4"
 ```
-This will generate:
--   `1_extracted_images/image_001.png`, `image_002.png`, ...
--   `timestamps.csv` (contains start time, end time, and duration for each scene).
 
-The `-t`/`--threshold` parameter controls sensitivity (default is `30`). A lower value is more sensitive to scene changes.
+### Example 2: Run specific steps
 
-### Step 2: Local Image-to-Video Conversion
-
-This step converts each extracted image into a short video clip.
+If you want to re-run only the video generation and recombination steps:
 ```bash
-python step2_local_i2v_svd.py
+python animate_podcast_v2.py "001.mp4" --steps "2,3"
 ```
--   **Model**: Uses `stabilityai/stable-video-diffusion-img2vid` by default.
--   **Input**: Reads `*.png` files from `1_extracted_images/`.
--   **Output**: Saves `*.mp4` files to `2_animated_clips/`.
 
-You can adjust key parameters inside the script:
--   `HEIGHT`, `WIDTH`: Resolution (e.g., `576x1024`). Higher values require more VRAM and time.
--   `NUM_FRAMES`: Number of frames to generate (e.g., `14` or `25`).
--   `FPS`: Frames per second (e.g., `8`–`12`).
--   `GUIDANCE_SCALE`: Motion intensity (e.g., `1.0`–`1.5`).
--   `DECODE_CHUNK_SIZE`: A memory-saving trick; set to `1` or `2` on low-VRAM GPUs.
--   `SEED`: A fixed value for reproducible results.
+### Command-Line Arguments
 
-### Step 3: Reassembly and Audio Sync
+-   `video_file`: Path to your source video. (Required)
+-   `--steps`: Comma-separated list of steps to run (e.g., `1,2,3`). Default is all steps.
 
-This step combines the generated clips and syncs them with the original audio.
-```bash
-python animate_podcast_v2.py "001.mp4" --step 3 -p loop
-```
-The `-p`/`--padding_strategy` can be `loop` or `freeze` to fill gaps if a video clip is shorter than its scene duration.
+**Step 1: Scene Detection**
+-   `-t`, `--threshold`: Scene detection sensitivity (lower = more sensitive). Default: `30`.
 
-The script will:
-1.  Read `timestamps.csv` and the video clips from `2_animated_clips/`.
-2.  Apply the padding strategy (`loop`/`freeze`) to match each clip's duration to its timestamp.
-3.  Normalize resolutions.
-4.  Concatenate all clips and merge them with the original audio track.
-5.  Output the final video to `001_animated_v2.mp4`.
+**Step 2: Image-to-Video Generation**
+-   `--height`, `--width`: Output video resolution. Default: `576x1024`.
+-   `--num_frames`: Number of frames per clip. Default: `25`.
+-   `--fps`: Frames per second for generated clips. Default: `12`.
+-   `--guidance_scale`: Motion intensity. Default: `1.2`.
+-   `--seed`: A fixed value for reproducible results. Default: `1234`.
+
+**Step 3: Video Recombination**
+-   `-p`, `--policy`: Strategy for short clips (`loop` or `freeze`). Default: `loop`.
 
 ## Optional `requirements.txt`
 
