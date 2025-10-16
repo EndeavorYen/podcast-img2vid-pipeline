@@ -81,7 +81,7 @@ repo-root/
     ```bash
     pip install -U pip
     pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
-    pip install diffusers transformers accelerate safetensors imageio-ffmpeg opencv-python tqdm pandas "scenedetect[opencv]"
+    pip install -r requirements.txt
     ```
 4.  Verify GPU setup:
     ```python

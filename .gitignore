@@ -1,3 +1,6 @@
 *.csv
 *.mp4
 1_extracted_images/
+2_animated_clips/
+.venv/
+__pycache__/
