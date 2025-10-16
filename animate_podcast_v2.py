@@ -3,8 +3,7 @@ from pathlib import Path
 
 # Import the refactored modules
 from modules.step1_scene_detection import find_scenes
-from modules.step2_i2v import generate_videos
-from modules.step3_recombine import recombine_videos
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -60,6 +59,7 @@ def main():
         find_scenes(source_video_path, threshold=args.threshold)
 
     if 2 in steps_to_run:
+        from modules.step2_i2v import generate_videos
         if not Path("1_extracted_images").is_dir():
             print("Error: '1_extracted_images' directory not found. Please run Step 1 first.")
             raise SystemExit(1)
@@ -74,6 +74,7 @@ def main():
         )
 
     if 3 in steps_to_run:
+        from modules.step3_recombine import recombine_videos
         if not timestamps_file.exists():
             print(f"Error: '{timestamps_file}' not found. Please run Step 1 first.")
             raise SystemExit(1)
