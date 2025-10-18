@@ -80,7 +80,7 @@ repo-root/
 3.  Install dependencies:
     ```bash
     pip install -U pip
-    pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu124
+    pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cu128
     pip install -r requirements.txt
     ```
 4.  Verify GPU setup:

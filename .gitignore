@@ -4,3 +4,4 @@
 2_animated_clips/
 .venv/
 __pycache__/
+modules/__pycache__/

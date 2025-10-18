@@ -3,6 +3,7 @@ import numpy as np
 import imageio.v3 as iio
 import cv2
 from pathlib import Path
+from PIL import Image
 from diffusers import StableVideoDiffusionPipeline
 from tqdm import tqdm
 
@@ -62,7 +63,9 @@ def generate_videos(
             print(f"Clip for {img_path.name} already exists, skipping.")
             continue
 
-        image = load_image(str(img_path), height, width)
+        image_np = load_image(str(img_path), height, width)
+        image = Image.fromarray(image_np)
+
         result = pipe(
             image=image,
             num_frames=num_frames,

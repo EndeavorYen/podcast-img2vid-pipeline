@@ -51,14 +51,22 @@ def recombine_videos(video_path: Path, timestamps_csv_path: Path, duration_polic
     for _, row in df.iterrows():
         image_basename = Path(row['image_file']).stem
         clip_path = animated_clips_dir / f"{image_basename}.mp4"
-
-        if not clip_path.exists():
-            print(f"⚠️  Missing clip: '{clip_path}', skipping this segment.")
-            continue
-
-        seg_clip = VideoFileClip(str(clip_path))
         seg_dur = float(row['duration'])
-        processed = fit_duration(seg_clip, seg_dur, policy=duration_policy)
+        processed = None
+
+        if clip_path.exists():
+            seg_clip = VideoFileClip(str(clip_path))
+            processed = fit_duration(seg_clip, seg_dur, policy=duration_policy)
+        else:
+            images_dir = Path("1_extracted_images")
+            image_filename = Path(row['image_file']).name
+            image_path = images_dir / image_filename
+            if image_path.exists():
+                print(f"⚠️  Missing clip: '{clip_path}', using fallback image '{image_path}'.")
+                processed = ImageClip(str(image_path)).with_duration(seg_dur)
+            else:
+                print(f"❌ Missing clip: '{clip_path}' and fallback image '{image_path}' not found. Skipping.")
+                continue
 
         if processed.size != target_resolution:
             processed = processed.resized(target_resolution)
